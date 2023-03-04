@@ -1,9 +1,12 @@
 package com.example.lec3.domain.model;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 
@@ -20,6 +23,21 @@ public class Account {
 
     @Column(name="name")
     private String username;
+
+    @Column(name="password")
+    private String password;
+
+    @Column(name="email")
+    private String email;
+
+    @CreationTimestamp
+    @Column(name="created_on")
+    @JsonSerialize(using= LocalDateTimeSerializer.class)
+    private LocalDateTime created_on;
+
+    @Column(name="last_login")
+    @JsonSerialize(using= LocalDateTimeSerializer.class)
+    private LocalDateTime last_login;
 
 //    @Column(name="created_on")
 //    private LocalDateTime created_on;

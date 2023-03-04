@@ -27,7 +27,7 @@ public class Task1Application {
     public CommandLineRunner run(RestTemplate restTemplate) throws Exception {
         return args -> {
             Quote quote = restTemplate.getForObject(
-                    "http://localhost:8080/api/1", Quote.class);
+                    "http://localhost:8002/api/1", Quote.class);
             log.info(quote.toString());
         };
     }
