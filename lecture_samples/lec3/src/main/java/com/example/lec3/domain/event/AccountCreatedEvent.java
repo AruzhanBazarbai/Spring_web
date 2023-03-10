@@ -4,8 +4,8 @@ import lombok.Data;
 import java.time.LocalDateTime;
 @Data
 public class AccountCreatedEvent {
-    String agregateObjectType;
-    String agregateObjectId;
+    String aggregateObjectType;
+    String aggregateObjectId;
     String messagePayload;
     LocalDateTime emittedDate;
 
