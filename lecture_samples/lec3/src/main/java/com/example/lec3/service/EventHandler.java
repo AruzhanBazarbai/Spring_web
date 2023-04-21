@@ -13,12 +13,12 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class EventHandler {
-    @Autowired
-    private KafkaTemplate<String,String> kafkaTemplate;
-    private final NewTopic topic1;
+//    @Autowired
+//    private KafkaTemplate<String,String> kafkaTemplate;
+//    private final NewTopic topic1;
     @EventListener
     public void process(AccountCreatedEvent event){
         log.info("Event received: "+event);
-        kafkaTemplate.send("test_topic", event.getAggregateObjectId(),"test");
+//        kafkaTemplate.send("test_topic", event.getAggregateObjectId(),"test");
     }
 }

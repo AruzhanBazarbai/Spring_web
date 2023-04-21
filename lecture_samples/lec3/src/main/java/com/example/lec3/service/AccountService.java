@@ -1,5 +1,6 @@
 package com.example.lec3.service;
 
+import com.example.lec3.domain.dto.AccountDTO;
 import com.example.lec3.domain.dto.CreateAccountDTO;
 import com.example.lec3.domain.event.AccountCreatedEvent;
 import com.example.lec3.domain.model.Account;
@@ -24,11 +25,12 @@ public class AccountService {
     public List<Account> findAllAccounts(){
         return accountRepository.findAll();
     }
-    public Account createAccount( CreateAccountDTO createAccountDTO) throws JsonProcessingException {
+    public AccountDTO createAccount( CreateAccountDTO createAccountDTO) throws JsonProcessingException {
         Account account=new Account();
         account.setUsername(createAccountDTO.getUsername());
         account.setEmail(createAccountDTO.getEmail());
         account.setPassword(createAccountDTO.getPassword());
+        account.setLast_login(createAccountDTO.getLoginDate());
         Account savedAccount=accountRepository.save(account);
 
         AccountCreatedEvent event=new AccountCreatedEvent();
@@ -40,11 +42,16 @@ public class AccountService {
         event.setMessagePayload(mapper.writeValueAsString(savedAccount));
 
         eventPublisher.publishEvent(event);
-        return savedAccount;
+        AccountDTO result=new AccountDTO(
+                savedAccount.getUsername(),
+                savedAccount.getPassword(),
+                savedAccount.getEmail(),
+                savedAccount.getLast_login());
+        return result;
     }
-    @KafkaListener(topicPattern = "my_super_topic")
-    public void listenGroupFoo(String message) {
-        System.out.println("Received Message in group foo: " + message);
-    }
+//    @KafkaListener(topicPattern = "my_super_topic")
+//    public void listenGroupFoo(String message) {
+//        System.out.println("Received Message in group foo: " + message);
+//    }
 
 }

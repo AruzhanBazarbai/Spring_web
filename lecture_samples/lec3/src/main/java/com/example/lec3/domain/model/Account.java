@@ -1,14 +1,20 @@
 package com.example.lec3.domain.model;
 
+import com.example.lec3.utils.ZonedDateTimeDeserializer;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
-import jakarta.persistence.*;
+import javax.persistence.*;
+
+import com.fasterxml.jackson.datatype.jsr310.ser.ZonedDateTimeSerializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.key.ZonedDateTimeKeySerializer;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 @Entity
 @Table(name="accounts")
@@ -36,8 +42,9 @@ public class Account {
     private LocalDateTime created_on;
 
     @Column(name="last_login")
-    @JsonSerialize(using= LocalDateTimeSerializer.class)
-    private LocalDateTime last_login;
+    @JsonSerialize(using= ZonedDateTimeSerializer.class)
+    @JsonDeserialize(using= ZonedDateTimeDeserializer.class)
+    private ZonedDateTime last_login;
 
 //    @Column(name="created_on")
 //    private LocalDateTime created_on;

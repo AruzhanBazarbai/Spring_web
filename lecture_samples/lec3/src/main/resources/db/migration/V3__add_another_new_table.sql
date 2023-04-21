@@ -1,0 +1,5 @@
+CREATE TABLE IF NOT EXISTS cars(
+    id UUID PRIMARY KEY,
+    model_name  VARCHAR(255) NOT NULL,
+    manufacturer VARCHAR(255) NOT NULL
+);
