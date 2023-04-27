@@ -1,0 +1,9 @@
+spring:
+  application:
+    name: BANK-SERVER-PROJECT
+
+server:
+  port: 9898
+logging:
+  file:
+    name: C:/Users/Aruzhan/Documents/spring_java/logs/elk-stack.log
