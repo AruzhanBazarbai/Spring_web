@@ -1,5 +1,7 @@
 package com.example.bankserverproject.controller;
 
+import com.example.bankserverproject.constants.ACTION;
+import com.example.bankserverproject.domain.dto.BalanceTransactionDTO;
 import com.example.bankserverproject.domain.dto.TransactionDTO;
 import com.example.bankserverproject.service.TransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,6 +45,20 @@ public class TransactionController {
     public ResponseEntity<List<TransactionDTO>> getAllTransactions() {
         List<TransactionDTO> transactionDtos = transactionService.findAllTransactions();
         return new ResponseEntity<>(transactionDtos, HttpStatus.OK);
+    }
+
+    @PostMapping( "/deposit")
+    public ResponseEntity<BalanceTransactionDTO> deposit(@RequestBody BalanceTransactionDTO balanceTransactionDTO) {
+        BalanceTransactionDTO depositTransaction = transactionService.updateAccountBalance(balanceTransactionDTO, ACTION.DEPOSIT);
+        log.info("transaction deposit: {}", depositTransaction);
+        return new ResponseEntity<>(depositTransaction, HttpStatus.CREATED);
+    }
+
+    @PostMapping( "/withdraw")
+    public ResponseEntity<BalanceTransactionDTO> withdraw(@RequestBody BalanceTransactionDTO balanceTransactionDTO) {
+        BalanceTransactionDTO depositTransaction = transactionService.updateAccountBalance(balanceTransactionDTO, ACTION.WITHDRAW);
+        log.info("transaction deposit: {}", depositTransaction);
+        return new ResponseEntity<>(depositTransaction, HttpStatus.CREATED);
     }
 
 }

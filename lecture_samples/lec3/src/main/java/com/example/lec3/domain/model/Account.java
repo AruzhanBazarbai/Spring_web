@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 
 @Entity
-@Table(name="accounts")
+@Table(name="accountsLab")
 @AllArgsConstructor
 @NoArgsConstructor
 @Data

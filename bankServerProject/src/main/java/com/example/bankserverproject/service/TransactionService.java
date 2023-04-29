@@ -1,9 +1,13 @@
 package com.example.bankserverproject.service;
 
+import com.example.bankserverproject.constants.ACTION;
+import com.example.bankserverproject.domain.dto.BalanceTransactionDTO;
 import com.example.bankserverproject.domain.dto.TransactionDTO;
 import com.example.bankserverproject.domain.model.Account;
+import com.example.bankserverproject.domain.model.BalanceTransaction;
 import com.example.bankserverproject.domain.model.Transaction;
 import com.example.bankserverproject.repository.AccountRepository;
+import com.example.bankserverproject.repository.BalanceTransactionRepository;
 import com.example.bankserverproject.repository.TransactionRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,6 +26,7 @@ public class TransactionService {
 
     private final TransactionRepository transactionRepository;
     private final AccountRepository accountRepository;
+    private final BalanceTransactionRepository balanceTransactionRepository;
 
     //    @Transactional
     public TransactionDTO createTransaction(TransactionDTO transactionDto) {
@@ -78,6 +83,66 @@ public class TransactionService {
     public List<TransactionDTO> findAllTransactions() {
         List<Transaction> transactions = transactionRepository.findAll();
         return TransactionDTO.fromTransactionList(transactions);
+    }
+    public Optional<TransactionDTO> getTransactionBySenderAccountId(Long id) {
+        Optional<Transaction> transactionOptional = transactionRepository.findById(id);
+        if (transactionOptional.isPresent()) {
+            Transaction transaction = transactionOptional.get();
+            TransactionDTO transactionDto = new TransactionDTO(transaction.getId(),
+                    transaction.getSenderAccount().getId(),
+                    transaction.getRecipientAccount().getId(),
+                    transaction.getAmount(),
+                    transaction.getCreatedDateTime());
+            return Optional.of(transactionDto);
+        } else {
+            return Optional.empty();
+        }
+    }
+    public BalanceTransactionDTO updateAccountBalance(BalanceTransactionDTO balanceTransactionDTO, ACTION action){
+        Long senderAccountId = balanceTransactionDTO.getSenderAccountId();
+        BigDecimal amount = balanceTransactionDTO.getAmount();
+
+        // Retrieve sender account from database
+        Optional<Account> senderAccountOptional = accountRepository.findById(senderAccountId);
+
+        if (senderAccountOptional.isPresent() && action == ACTION.DEPOSIT){
+            Account senderAccount = senderAccountOptional.get();
+//            System.out.println(senderAccount);
+            // Update sender account balances
+            senderAccount.setCurrentBalance(senderAccount.getCurrentBalance().add(amount));
+            System.out.println("Account Current Balance after Deposit" + senderAccount.getCurrentBalance());
+            // Save updated account to the database
+            accountRepository.save(senderAccount);
+
+            // Create and save transaction to the database
+            BalanceTransaction balanceTransaction = new BalanceTransaction(senderAccount, amount, ACTION.DEPOSIT.toString());
+            balanceTransactionRepository.save(balanceTransaction);
+            balanceTransactionDTO.setId(balanceTransaction.getId());
+            balanceTransactionDTO.setTransactionTime(balanceTransaction.getCreatedDateTime());
+            balanceTransactionDTO.setAction(ACTION.DEPOSIT.toString());
+            return balanceTransactionDTO;
+        } else if (senderAccountOptional.isPresent() && action == ACTION.WITHDRAW) {
+            Account senderAccount = senderAccountOptional.get();
+//            System.out.println(senderAccount);
+            // Update sender account balances
+            if (senderAccount.getCurrentBalance().compareTo(amount) < 0) {
+                throw new IllegalArgumentException("Insufficient balance in sender account");
+            }
+            senderAccount.setCurrentBalance(senderAccount.getCurrentBalance().subtract(amount));
+            System.out.println("Account Current Balance after Withdraw" + senderAccount.getCurrentBalance());
+            // Save updated account to the database
+            accountRepository.save(senderAccount);
+
+            // Create and save transaction to the database
+            BalanceTransaction balanceTransaction = new BalanceTransaction(senderAccount, amount, ACTION.WITHDRAW.toString());
+            balanceTransactionRepository.save(balanceTransaction);
+            balanceTransactionDTO.setId(balanceTransaction.getId());
+            balanceTransactionDTO.setTransactionTime(balanceTransaction.getCreatedDateTime());
+            balanceTransactionDTO.setAction(ACTION.WITHDRAW.toString());
+            return balanceTransactionDTO;
+        } else {
+            throw new IllegalArgumentException("Sender account or recipient account not found");
+        }
     }
 
 
